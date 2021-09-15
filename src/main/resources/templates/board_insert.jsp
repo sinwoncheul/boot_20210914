@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    <form th:action="@(/board/insert)" method="post">
+    <form th:action="@{/board/insert}" method="post">
         제목 : <input type="text" name="title"> <br />
         내용 : <input type="text" name="content"> <br />
         작성자 : <input type="text" name="writer"> <br />

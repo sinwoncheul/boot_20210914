@@ -11,6 +11,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,10 +45,11 @@ public class Board {
     @Column(name = "WRITER")
     private String writer = null; // 작성자
 
-    @Column(name = "HIT")
+    @Column(updatable = false, name = "HIT")
     private int hit = 1; // 조회수
 
     @CreationTimestamp // 날짜는 자동으로 추가
-    @Column(name = "REGDATE")
+
+    @Column(updatable = false, name = "REGDATE")
     private Date regdate = null; // 날짜
 }
