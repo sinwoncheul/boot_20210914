@@ -15,6 +15,9 @@
     글제목 : <div style="display:inline-block" th:text="${board.title}"></div> <br />
     글내용 : <div style="display:inline-block" th:text="${board.content}"></div> <br />
     작성자 : <div style="display:inline-block" th:text="${board.writer}"></div> <br />
+    조회수 : <div style="display:inline-block" th:text="${board.hit}"></div> <br />
+    날짜 : <div style="display:inline-block" th:text="${board.regdate}"></div> <br />
+    이미지 : <img th:src="@{/board/select_image(no=${board.no})}" width="50px" height="50px" > <br />
 
     <hr />
 

@@ -1,30 +1,101 @@
 package com.example.controller;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
-import com.example.entity.Board;
-import com.example.repository.BoardRepsoitory;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.example.entity.Board;
+
+import com.example.repository.BoardRepsoitory;
 
 @Controller
 @RequestMapping(value = "/board")
 public class BoardController {
 
+    @Autowired
+    private ResourceLoader resourceLoader;
+
     // 상수
-    private final int PAGECNT = 10;
+    // import org.springframework.beans.factory.annotation.Value;
+    @Value("${board.page.count}")
+    private int PAGECNT;
+
+    @Value("${default.image}")
+    private String DEFAULTIMAGE;
 
     // 저장소 객체 생성
     @Autowired
     private BoardRepsoitory bRepository;
+
+    // 127.0.0.1:8080/ROOT/board/select_image?no=번호
+    // <img src="/board/select_image?no=12" / >
+    @RequestMapping(value = "/select_image", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> selectImage(@RequestParam("no") long no) throws IOException {
+        try {
+            Board board = bRepository.getById(no);
+            if (board.getImage().length > 0) {
+                HttpHeaders headers = new HttpHeaders();
+                if (board.getImagetype().equals("image/jpeg")) {
+                    headers.setContentType(MediaType.IMAGE_JPEG);
+                } else if (board.getImagetype().equals("image/png")) {
+                    headers.setContentType(MediaType.IMAGE_PNG);
+                }
+
+                // 클래스명 response = new 클래스명( 생성자선택 )
+                ResponseEntity<byte[]> response = new ResponseEntity<>(board.getImage(), headers, HttpStatus.OK);
+                return response;
+            }
+            return null;
+        }
+        // 오라클에 이미지를 읽을 수 없을 경우
+        catch (Exception e) {
+            InputStream is = resourceLoader.getResource(DEFAULTIMAGE).getInputStream();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_JPEG);
+            ResponseEntity<byte[]> response = new ResponseEntity<>(is.readAllBytes(), headers, HttpStatus.OK);
+            return response;
+        }
+    }
+
+    // 127.0.0.1:8080/ROOT/board/insert_image
+    @RequestMapping(value = "/insert_image", method = RequestMethod.GET)
+    public String insertImageGet() {
+        return "board_insert_image";
+    }
+
+    @RequestMapping(value = "/insert_image", method = RequestMethod.POST)
+    public String insertImagePost(@ModelAttribute Board board, @RequestParam(name = "file") MultipartFile file)
+            throws IOException {
+        // System.out.println(board.toString());
+        // System.out.println(file.getOriginalFilename());
+        // System.out.println(file.getSize());
+        board.setImage(file.getBytes());
+        board.setImagename(file.getOriginalFilename());
+        board.setImagesize(file.getSize());
+        board.setImagetype(file.getContentType());
+
+        bRepository.save(board);
+
+        return "redirect:select";
+    }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public String updatePost(@ModelAttribute Board board) {
@@ -83,14 +154,6 @@ public class BoardController {
         if (obj.isPresent()) {
             Board board = obj.get();
 
-            // 다음글 객체
-            Board board3 = bRepository.findTop1ByNo(no);
-            if (board3 == null) {
-                model.addAttribute("next", 0);
-            } else {
-                model.addAttribute("next", board3.getNo());
-            }
-
             // 이전글 객체 가져오기
             Board board1 = bRepository.findTop1ByNoLessThanOrderByNoDesc(no);
             if (board1 == null) { // 가져온 값이 없다면
@@ -132,13 +195,6 @@ public class BoardController {
     // 127.0.0.1:8080/ROOT/board/insert
     @RequestMapping(value = "/insert", method = RequestMethod.GET)
     public String insertGet() {
-
-        Board b = new Board();
-        b.setNo(4L);
-        b.setWriter("aaa");
-
-        bRepository.save(b);
-
         return "board_insert";
     }
 
@@ -150,4 +206,5 @@ public class BoardController {
         // 127.0.0.1:8080/ROOT/board/ (insert <= select)
         return "redirect:select";
     }
+
 }

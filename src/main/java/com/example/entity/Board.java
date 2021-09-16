@@ -7,11 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,11 +25,10 @@ import lombok.ToString;
 
 @Entity // 엔티티 => 자동으로 테이블 생성
 @Table(name = "BOARD1") // 테이블 명
-@SequenceGenerator(name = "SEQ_BOARD1", sequenceName = "SEQ_BOARD1_NO", initialValue = 1, allocationSize = 1) // 시퀀스
-                                                                                                              // 생성(자동으로
-                                                                                                              // 증가되는
-                                                                                                              // 번호)
+@SequenceGenerator(name = "SEQ_BOARD1", sequenceName = "SEQ_BOARD1_NO", initialValue = 1, allocationSize = 1)
+
 public class Board {
+
     @Column(name = "NO") // 컬럼명
     @Id // 기본키(중복X)
     // 여기 추가되는 정보는 위에 생성한 시퀀스 사용
@@ -49,7 +48,24 @@ public class Board {
     private int hit = 1; // 조회수
 
     @CreationTimestamp // 날짜는 자동으로 추가
-
     @Column(updatable = false, name = "REGDATE")
     private Date regdate = null; // 날짜
+
+    // String => varchar2
+    // long => number
+    // byte[] => blob
+    // 오라클에서 byte[]을 저장하는 타입을 BLOB CLOB
+    @Lob
+    @Column(name = "IMAGE")
+    private byte[] image = null; // 이미지데이터
+
+    @Column(name = "IMAGENAME")
+    private String imagename = null; // 파일명
+
+    @Column(name = "IMAGESIZE", nullable = false, columnDefinition = "long default 0")
+    private long imagesize = 0L; // 파일 사이즈
+
+    @Column(name = "IMAGETYPE")
+    private String imagetype = null; // 파일 종류
+
 }

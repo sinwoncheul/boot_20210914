@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <div style="padding:10px">
+    <div id="app" style="padding:10px">
 
         <a th:href="@{/board/insert}">게시판글쓰기</a>
         <hr />
@@ -32,8 +32,9 @@
                 <td th:text="${idx.count}"></td>
                 <td th:text="${brd.no}"></td>
                 <td>
-                    <a th:href="@{/board/select_one(no=${brd.no})}" 
-                    th:text="${brd.title}"></a>
+                    <a href="#" 
+                        th:text="${brd.title}" 
+                        th:@click="'handleHit(\'' + ${brd.no} + '\')'"></a>
                 </td>
                 <td th:text="${brd.writer}"></td>
                 <td th:text="${brd.hit}"></td>
@@ -44,6 +45,39 @@
         <th:block th:each="i : ${#numbers.sequence(1,cnt)}">
             <a th:href="@{/board/select(page=${i}, title=${param.title})}" th:text="${i}"></a>
         </th:block>
-    </div>  
+    </div>
+
+
+    <!-- CDN방식(x),  CLI방식(o) -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        new Vue({
+            el :'#app',
+
+            data : function(){
+                return {
+                    // vueList: /*[[ ${list} ]]*/
+                }
+            },
+            methods:{
+                async handleHit(no) {
+                    console.log(this.vueList);
+                    const headers = {"Content-Type":"application/json"};
+                    const url  = "/ROOT/board_api/update_hit.json?no=" + Number(no);
+                    const response = await axios.put(url, {}, headers);
+                    console.log(response);
+
+                    if(response.data.ret === 1){
+                        window.location.href="/ROOT/board/select_one?no=" + Number(no);
+                    }
+                }
+            }
+        });  
+        /*]]>*/  
+    </script>
+
 </body>
 </html>
+
