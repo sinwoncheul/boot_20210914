@@ -8,7 +8,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @PropertySource("classpath:global.properties")
-@ComponentScan(basePackages = { "com.example.controller", "com.example.restcontroller" })
+@ComponentScan(basePackages = { "com.example.controller", "com.example.restcontroller", "com.example.security" })
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = { "com.example.repository" })
 @EntityScan(basePackages = { "com.example.entity" })
