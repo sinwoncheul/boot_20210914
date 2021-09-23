@@ -1,11 +1,16 @@
 package com.example.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.Optional;
 
 import com.example.entity.Member;
 import com.example.repository.MemberRepsoitory;
@@ -34,5 +39,25 @@ public class MemberController {
 
         mRepository.save(member);
         return "redirect:/";
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public String loginGET() {
+        return "member_login";
+    }
+
+    @RequestMapping(value = "/mypage", method = RequestMethod.GET)
+    public String mypageGET(Authentication authentication, Model model) {
+        if (authentication != null) {
+            User user = (User) authentication.getPrincipal();
+
+            Optional<Member> obj = mRepository.findById(user.getUsername());
+            model.addAttribute("member", obj.get());
+
+            return "member_mypage";
+        } else { // 로그인이 되어 있지 않다면
+            return "redirect:/member/login";
+        }
+
     }
 }

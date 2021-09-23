@@ -1,43 +1,35 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" type="text/css" 
-        th:href="@{/css/bootstrap.min.css}"/>
+    <title>home.jsp</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}"/>
 	<script th:src="@{/js/bootstrap.min.js}"></script>
 </head>
 
 <body>
 	<div class="container">
-    	home 한글
-    	<h1 th:text="테스트"></h1>
+        <div sec:authorize="isAuthenticated()">
 
-        <div th:text="${ti}"/>
-        <div th:text="${nu}"/>
-        <hr />
+	        <h3 sec:authorize="hasAuthority('ADMIN')">권한 ADMIN</h3>
+	        <h3 sec:authorize="hasAuthority('SELLER')">권한 SELLER</h3>
+	        <h3 sec:authorize="hasAuthority('CUSTOMER')">권한 CUSTOMER</h3> 
+	        
+	        인증정보 : <div sec:authentication="principal"></div>
+	        사용자 ID : <div sec:authentication="name"></div>
+        
+			<form th:action="@{/member/logout}" method="post">
+				<input type="submit" value="로그아웃" />
+			</form>
+        </div>
 
-        <div th:text="${obj.no}"/>
-        <div th:text="${obj.title}"/>
-        <div th:text="${obj.content}"/>
-        <hr />
-        <table border="1">
-            <tr th:each="brd, idx : ${li}">
-                <td th:text="${idx}"></td>
-                <td th:text="${brd.no}"></td>
-                <td th:text="${brd.title}"></td>
-                <td th:text="${brd.content}"></td>
-            </tr>
-        </table>
-        <hr />
-
-        <a th:href="@{/board/list(no=1)}">게시판 목록</a>
-        <a th:href="@{/board/list(no=1, name='b')}">게시판 목록</a>
-
-    	<input type="button" class="btn btn-success" value="테스트" />
+		<div sec:authorize="!isAuthenticated()">
+			<a th:href="@{/member/login}">로그인</a>
+			<a th:href="@{/member/join}">회원가입</a>
+        </div>
     </div>
 </body>
 </html>
-
