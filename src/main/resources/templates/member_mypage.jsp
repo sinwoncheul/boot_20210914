@@ -19,18 +19,28 @@
 		<div th:if="${#strings.toString(param.menu)=='1'}">
 			<h4>회원정보수정</h4>	
 			<form th:action="@{/member/mypage(menu=1)}" method="post">
-				<input type="text" th:value="${member.username}" /><br />
-				<input type="text" th:value="${member.usertel}" /><br />
+				<input type="text" name="username" th:value="${member.username}" /><br />
+				<input type="text" name="usertel" th:value="${member.usertel}" /><br />
 				<input type="submit" value="회원정보수정" />
 			</form>
 		</div>
 
 		<div th:if="${#strings.toString(param.menu)=='2'}">
-			<h4>비밀번호변경</h4>	
+			<h4>비밀번호변경</h4>
+			<form th:action="@{/member/mypage(menu=2)}" method="post">
+				<input type="password" name="oldpw" placeholder="현재비밀번호" /><br />
+				<input type="password" name="newpw" placeholder="변경비밀번호" /><br />
+				<input type="password" name="newpw1" placeholder="변경비밀번호확인" /><br />
+				<input type="submit" value="비밀번호변경" />
+			</form>	
 		</div>
 		
 		<div th:if="${#strings.toString(param.menu)=='3'}">
-			<h4>회원탈퇴</h4>	
+			<h4>회원탈퇴</h4>
+			<form th:action="@{/member/mypage(menu=3)}" method="post">
+				<input type="password" name="oldpw" placeholder="현재비밀번호" /><br />
+				<input type="submit" value="회원탈퇴" />
+			</form>		
 		</div>	
     </div>
 </body>

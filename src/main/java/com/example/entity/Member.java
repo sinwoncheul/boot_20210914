@@ -1,10 +1,14 @@
 package com.example.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.springframework.data.annotation.Transient;
@@ -36,4 +40,8 @@ public class Member {
     private String userrole = null;
     @Column(name = "USERDATE")
     private Date userdate = null;
+    // 1 : N의 관계이고, Address 엔티티의 member변수와 매핑됨
+    // @OneToMany(mappedBy = "member")
+    // @OrderBy("no asc")
+    // private List<Address> addressList = new ArrayList<>();
 }
