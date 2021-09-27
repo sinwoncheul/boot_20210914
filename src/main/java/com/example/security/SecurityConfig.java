@@ -49,6 +49,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 // 접근 불가 시 보여질 페이지 주소 설정
                 .exceptionHandling().accessDeniedPage("/page403").and();
+        // h2-console 사용하기위해서
+        // restful사용시에도 해제
+        http.csrf().disable();
+        http.headers().frameOptions().sameOrigin();
     }
 
 }
