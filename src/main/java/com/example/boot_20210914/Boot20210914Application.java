@@ -16,6 +16,7 @@ public class Boot20210914Application {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Boot20210914Application.class, args);
+
 		System.out.println("시작");
 	}
 

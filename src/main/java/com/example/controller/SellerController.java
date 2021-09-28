@@ -4,18 +4,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.entity.Item;
-import com.example.entity.ItemImage;
-import com.example.entity.ItemProjection;
-import com.example.repository.ItemImageRepository;
-import com.example.repository.ItemRepository;
-import com.example.repository.MemberRepsoitory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +19,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.example.entity.Item;
+import com.example.entity.ItemImage;
+import com.example.entity.ItemProjection;
+import com.example.entity.Member;
+import com.example.repository.ItemImageRepository;
+import com.example.repository.ItemRepository;
+import com.example.repository.MemberRepsoitory;
 
 @Controller
 @RequestMapping("/seller")
@@ -102,21 +105,28 @@ public class SellerController {
     }
 
     @PostMapping(value = "/insert_item")
-    public String insertItemPost(@RequestParam(name = "name") String[] name,
+    public String insertItemPost(Authentication auth, @RequestParam(name = "name") String[] name,
             @RequestParam(name = "content") String[] content, @RequestParam(name = "price") Long[] price,
             @RequestParam(name = "quantity") Long[] quantity) {
+        if (auth != null) {
+            List<Item> list = new ArrayList<>();
+            for (int i = 0; i < name.length; i++) {
+                Item item = new Item();
+                item.setName(name[i]);
+                item.setContent(content[i]);
+                item.setPrice(price[i]);
+                item.setQuantity(quantity[i]);
 
-        List<Item> list = new ArrayList<>();
-        for (int i = 0; i < name.length; i++) {
-            Item item = new Item();
-            item.setName(name[i]);
-            item.setContent(content[i]);
-            item.setPrice(price[i]);
-            item.setQuantity(quantity[i]);
-            list.add(item);
+                User user = (User) auth.getPrincipal();
+                Member member = mRepsoitory.getById(user.getUsername());
+
+                item.setMember(member);
+                list.add(item);
+            }
+            iRepository.saveAll(list);
+            return "redirect:/seller/insert_item"; // 페이지 전환
         }
-        iRepository.saveAll(list);
-        return "redirect:/seller/select_item"; // 페이지 전환
+        return "redirect:/member/login";
     }
 
 }

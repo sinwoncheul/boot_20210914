@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 import com.example.entity.Board;
+import com.example.entity.BoardProjection;
 
 public interface BoardRepsoitory extends JpaRepository<Board, Long> {
     // 전체조회 + 글번호기준 내림차순 정렬
@@ -16,6 +17,11 @@ public interface BoardRepsoitory extends JpaRepository<Board, Long> {
 
     // 제목에 단어가 포함하는 + 글번호기준 내림차순 정렬 + 페이지네이션
     List<Board> findByTitleContainingOrderByNoDesc(String title, Pageable pageable);
+
+    // 제목에 단어 포함
+    // 글번호기준 내림차순
+    // 페이지네이션
+    List<BoardProjection> findByTitleIgnoreCaseContainingOrderByNoDesc(String title, Pageable pageable);
 
     // 제목에 단어가 포함된 전체 개수
     long countByTitleContaining(String title);

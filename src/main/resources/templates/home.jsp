@@ -30,6 +30,18 @@
 			<a th:href="@{/member/login}">로그인</a>
 			<a th:href="@{/member/join}">회원가입</a>
         </div>
+
+		<hr />
+		<th:block th:each="obj, idx : ${list}">
+			<div th:text="${obj.name}" style="display:inline-block"></div>
+			<div th:text="${obj.price}" style="display:inline-block"></div>
+            <img th:src="@{/item_image_preview(itemno=${obj.no}, idx=0)}" width="50px" height="50px" />
+
+			<th:block th:if="${idx.count % 3 ==0 }">
+            	<hr />
+            </th:block>
+		</th:block>
+
     </div>
 </body>
 </html>
