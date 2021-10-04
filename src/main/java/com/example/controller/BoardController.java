@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.entity.Board;
+import com.example.entity.BoardProjection;
 import com.example.repository.BoardRepsoitory;
 
 @Controller
@@ -246,7 +247,7 @@ public class BoardController {
             Board board = obj.get();
 
             // 이전글 객체 가져오기
-            Board board1 = bRepository.findTop1ByNoLessThanOrderByNoDesc(no);
+            BoardProjection board1 = bRepository.findTop1ByNoLessThanOrderByNoDesc(no);
             if (board1 == null) { // 가져온 값이 없다면
                 model.addAttribute("prev", 0);
             } else {

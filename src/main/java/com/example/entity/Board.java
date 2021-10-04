@@ -44,7 +44,7 @@ public class Board {
     @Column(name = "WRITER")
     private String writer = null; // 작성자
 
-    @Column(updatable = false, name = "HIT")
+    @Column(name = "HIT")
     private int hit = 1; // 조회수
 
     @CreationTimestamp // 날짜는 자동으로 추가

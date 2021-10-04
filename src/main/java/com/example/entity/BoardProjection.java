@@ -9,6 +9,8 @@ public interface BoardProjection {
 
     String getTitle();
 
+    String getContent();
+
     String getWriter();
 
     Date getRegdate();

@@ -15,9 +15,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +39,69 @@ public class ApiController {
 
     @Value("${default.image}")
     private String DEFAULTIMAGE;
+
+    // 삭제
+    // /ROOT/api/board_delete?no=번호
+    @RequestMapping(value = "/board_delete", method = RequestMethod.DELETE, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Long> boardDelete(@RequestParam(name = "no") long no) {
+        Map<String, Long> map = new HashMap<>();
+        try {
+            bRepository.deleteById(no);
+            map.put("result", 1L);
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", 0L);
+        }
+        return map;
+
+    }
+
+    // 수정
+    // /ROOT/api/board_update
+    @RequestMapping(value = "/board_update", method = RequestMethod.PUT, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Long> boardUpdate(@RequestBody Board board) {
+        Map<String, Long> map = new HashMap<>();
+        try {
+            Board board1 = bRepository.findById(board.getNo()).get();
+            board.setImage(board1.getImage());
+            board.setImagename(board1.getImagename());
+            board.setImagesize(board1.getImagesize());
+            board.setImagetype(board1.getImagetype());
+            bRepository.save(board);
+            map.put("result", 1L);
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", 0L);
+        }
+        return map;
+
+    }
+
+    // 이전글
+    @RequestMapping(value = "/board_select_prev", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Long> boardSelectPrev(@RequestParam(name = "no") long no) {
+        Map<String, Long> map = new HashMap<>();
+        map.put("result", 1L);
+        map.put("prev", 0L);
+        BoardProjection board1 = bRepository.findTop1ByNoLessThanOrderByNoDesc(no);
+        if (board1 != null) { // 가져온 값이 있다면
+            map.put("prev", board1.getNo());
+        }
+        return map;
+    }
+
+    // 다음글
+    @RequestMapping(value = "/board_select_next", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Long> boardSelectNext(@RequestParam(name = "no") long no) {
+        Map<String, Long> map = new HashMap<>();
+        map.put("result", 1L);
+        map.put("next", 0L);
+        BoardProjection board1 = bRepository.findTop1ByNoGreaterThanOrderByNoAsc(no);
+        if (board1 != null) { // 가져온 값이 있다면
+            map.put("next", board1.getNo());
+        }
+        return map;
+    }
 
     // 이미지
     // /ROOT/api/select_image
@@ -71,14 +136,33 @@ public class ApiController {
         }
     }
 
-    // GET => /ROOT/api/board_select_one
+    // GET => /ROOT/api/board_select_one?no=글번호
     // 이미지는 전송하지 않음
-
-    @RequestMapping(value = "/board_insert", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> boardinsert(@ModelAttribute Board board,
-            @RequestParam(name = "file") MultipartFile file) {
+    @RequestMapping(value = "/board_select_one", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> boardSelect(@RequestParam(name = "no") long no) {
         Map<String, Object> map = new HashMap<>();
         try {
+            // 파일관련 항목은 제외
+            BoardProjection board = bRepository.findByNo(no);
+            map.put("result", 1);
+            map.put("data", board);
+            map.put("imageurl", "/ROOT/api/select_image?no=" + no);
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", 0);
+        }
+        return map;
+    }
+
+    // /ROOT/api/board_insert
+    @RequestMapping(value = "/board_insert", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> boardInsert(@ModelAttribute Board board,
+            @RequestParam(name = "file") MultipartFile file) {
+
+        System.out.println(board.toString());
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // board => 제목, 내용, 작성자
             board.setImage(file.getBytes());
             board.setImagename(file.getOriginalFilename());
             board.setImagesize(file.getSize());
@@ -90,7 +174,6 @@ public class ApiController {
             map.put("result", 0);
         }
         return map;
-
     }
 
     // vue에서 /ROOT/api/board_select?page=1&title= 로 호출해야함
@@ -112,4 +195,38 @@ public class ApiController {
         return map;
     }
 
+    //
+    // RequestBody Map<> => RequestBody Board
+    // /ROOT/api/update_hit { no:9 } => @RequestParam()
+    @RequestMapping(value = "/update_hit", method = {
+            RequestMethod.PUT }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Integer> updateOne(@RequestBody Map<String, Long> map1) {
+        // { no:9 }
+        System.out.println(map1.get("no"));
+
+        // JSON변경하기 위한 map
+        Map<String, Integer> map = new HashMap<>();
+        try {
+            Board board = bRepository.getById(map1.get("no"));
+            board.setHit(board.getHit() + 1);
+            bRepository.save(board);
+            map.put("result", 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", 0);
+        }
+        return map;
+    }
+
+    // /ROOT/board_select_one?no=11
+    // @RequestParam("no") long no 받음
+
+    // POST, PUT, DELETE은 body로 보낼수 있음
+    // 이미지 포함되면 form-data =>
+    // content-type:"multipart/form-data"
+    // @ModelAttribute @RequestParam 받음
+
+    // Content-type:"application/json"
+    // JSON(vue, react) 으로 {"no":123,"title":"bbb"}
+    // @RequestBody 로 받음
 }

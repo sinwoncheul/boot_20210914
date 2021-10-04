@@ -27,6 +27,13 @@
 
 	<dependencies>
 
+		        <!-- jjwt -->
+				<dependency>
+					<groupId>io.jsonwebtoken</groupId>
+					<artifactId>jjwt</artifactId>
+					<version>0.9.1</version>
+				</dependency>
+
 		<!--  h2 db embedded용 db-->
 		<dependency>
 			<groupId>com.h2database</groupId>

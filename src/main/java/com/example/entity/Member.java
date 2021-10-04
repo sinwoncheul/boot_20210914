@@ -11,6 +11,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.springframework.data.annotation.Transient;
 
 import lombok.Getter;
@@ -28,6 +30,7 @@ public class Member {
     @Column(name = "USERID")
     private String userid = null;
     @Column(name = "USERPW")
+    @JsonIgnore
     private String userpw = null;
 
     @Transient // 컬럼이 안만들어짐
@@ -36,9 +39,9 @@ public class Member {
     private String username = null;
     @Column(name = "USERTEL")
     private String usertel = null;
-    @Column(name = "USERROLE")
+    @Column(name = "USERROLE", updatable = false)
     private String userrole = null;
-    @Column(name = "USERDATE")
+    @Column(name = "USERDATE", updatable = false)
     private Date userdate = null;
     // 1 : N의 관계이고, Address 엔티티의 member변수와 매핑됨
     // @OneToMany(mappedBy = "member")
