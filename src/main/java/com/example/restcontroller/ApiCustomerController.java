@@ -50,14 +50,16 @@ public class ApiCustomerController {
 
     // 127.0.0.1:8080/api/customer/orderlist
     // token
-    @RequestMapping(value = "/customer/orderlist", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> customerOrderList(@RequestHeader("token") String token) {
-        String id = jwtUtil.extractUsername(token.substring(7));
-        List<Order> list = oRepository.findByMember_Userid(id);
-        Map<String, Object> map = new HashMap<>();
-        map.put("status", 200L);
-        map.put("list", list);
-        return map;
-    }
+    // @RequestMapping(value = "/customer/orderlist", method = RequestMethod.GET,
+    // consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    // public Map<String, Object> customerOrderList(@RequestHeader("token") String
+    // token) {
+    // String id = jwtUtil.extractUsername(token.substring(7));
+    // List<Order> list = oRepository.findByMember_Userid(id);
+    // Map<String, Object> map = new HashMap<>();
+    // map.put("status", 200L);
+    // map.put("list", list);
+    // return map;
+    // }
 
 }

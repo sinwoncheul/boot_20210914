@@ -28,7 +28,7 @@ public class JwtUtil {
     public String generateToken(String username) {
         // 2021-09-30 09:47:50.034 => 1234567890 => 1234567890123
         // long tokenValidTime = 1000 * 60 * 30; //30분
-        long tokenValidTime = 1000 * 60 * 60 * 4; // 4시간
+        long tokenValidTime = 1000 * 60 * 60 * 24; // 4시간
 
         Map<String, Object> claims = new HashMap<>();
         String token = Jwts.builder().setClaims(claims).setSubject(username)
